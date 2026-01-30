@@ -7,7 +7,8 @@
     "test:watch": "deno test --watch --allow-read"
   },
   "imports": {
-    "vite": "npm:vite@^5.4"
+    "vite": "npm:vite@^5.4",
+    "three": "npm:three@^0.160.0"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "deno.ns"],

@@ -6,6 +6,10 @@ import {
   type SignatureInput,
 } from './arcana.ts';
 
+import { CharacterTransformation } from './demos/CharacterTransformation.ts';
+import { HexPipeline } from './demos/HexPipeline.ts';
+import { SymbolAssembly } from './demos/SymbolAssembly.ts';
+
 // Tab Navigation
 function initTabNavigation() {
   const nav = document.getElementById('main-nav')!;
@@ -208,10 +212,51 @@ function initDecodeTab() {
   });
 }
 
+// Demos Tab
+let demo1: CharacterTransformation | null = null;
+let demo2: HexPipeline | null = null;
+let demo3: SymbolAssembly | null = null;
+
+function initDemosTab() {
+  const demo1Container = document.getElementById('demo1-container');
+  const demo2Container = document.getElementById('demo2-container');
+  const demo3Container = document.getElementById('demo3-container');
+  const demo1Input = document.getElementById('demo1-input') as HTMLInputElement;
+  const demo3Input = document.getElementById('demo3-input') as HTMLInputElement;
+
+  if (!demo1Container || !demo2Container || !demo3Container) return;
+
+  // Initialize demos when Demos tab is clicked
+  const demosButton = document.querySelector('button[data-tab="demos"]');
+  let demosInitialized = false;
+
+  demosButton?.addEventListener('click', () => {
+    if (demosInitialized) return;
+
+    // Demo 1
+    demo1 = new CharacterTransformation(demo1Container);
+    demo1Input?.addEventListener('input', (e) => {
+      demo1?.onTextInput((e.target as HTMLInputElement).value);
+    });
+
+    // Demo 2
+    demo2 = new HexPipeline(demo2Container);
+
+    // Demo 3
+    demo3 = new SymbolAssembly(demo3Container);
+    demo3Input?.addEventListener('input', (e) => {
+      demo3?.onTextInput((e.target as HTMLInputElement).value);
+    });
+
+    demosInitialized = true;
+  });
+}
+
 // Initialize everything
 document.addEventListener('DOMContentLoaded', () => {
   initTabNavigation();
   initHomeAnimation();
   initCreateTab();
   initDecodeTab();
+  initDemosTab();
 });

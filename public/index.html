@@ -243,9 +243,29 @@
     <!-- Demos Tab -->
     <div id="demos" class="tab-content">
         <h1 style="margin-bottom: 32px;">Encoding Visualizations</h1>
-        <p style="color: #a0a0c0; margin-bottom: 48px;">
-            Three.js demos coming soon - Character Transformation, Hex Pipeline, Symbol Assembly
-        </p>
+
+        <!-- Demo 1: Character Transformation -->
+        <div style="margin-bottom: 48px;">
+            <h2 style="color: #8b5cf6; margin-bottom: 16px;">1. Character Transformation</h2>
+            <p style="color: #a0a0c0; margin-bottom: 16px;">Watch characters morph into geometric symbols in 3D space</p>
+            <input type="text" id="demo1-input" placeholder="Type to see transformation..." style="margin-bottom: 16px;">
+            <div id="demo1-container" style="width: 100%; height: 400px; border-radius: 8px; overflow: hidden;"></div>
+        </div>
+
+        <!-- Demo 2: Hex Pipeline -->
+        <div style="margin-bottom: 48px;">
+            <h2 style="color: #f97316; margin-bottom: 16px;">2. Hex Pipeline</h2>
+            <p style="color: #a0a0c0; margin-bottom: 16px;">See the encoding pipeline in 3D: Text → Hex → Symbols</p>
+            <div id="demo2-container" style="width: 100%; height: 400px; border-radius: 8px; overflow: hidden;"></div>
+        </div>
+
+        <!-- Demo 3: Symbol Assembly -->
+        <div style="margin-bottom: 48px;">
+            <h2 style="color: #06b6d4; margin-bottom: 16px;">3. Symbol Assembly</h2>
+            <p style="color: #a0a0c0; margin-bottom: 16px;">Type to see which symbols light up from the toolbox</p>
+            <input type="text" id="demo3-input" placeholder="Type to activate symbols..." style="margin-bottom: 16px;">
+            <div id="demo3-container" style="width: 100%; height: 400px; border-radius: 8px; overflow: hidden;"></div>
+        </div>
     </div>
 
     <!-- Create Tab -->
