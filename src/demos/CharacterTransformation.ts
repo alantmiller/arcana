@@ -1,4 +1,4 @@
-import * as THREE from 'npm:three@^0.160.0';
+import * as THREE from 'three';
 import { symbolMap } from '../arcana.ts';
 
 export class CharacterTransformation {
