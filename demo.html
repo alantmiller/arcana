@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana: AI-Inspired Signature Encoding</title>
+    <script src="https://cdn.jsdelivr.net/npm/zod@3/dist/zod.min.js"></script>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.5;
+        }
+        h1, h2 { color: #1a3c6d; }
+        form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+        label { display: block; margin: 0.8rem 0 0.3rem; font-weight: 600; }
+        input, textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 0.7rem 1.2rem;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover { background: #0b5ed7; }
+        #output-container, #vq-output-container, #decode-output-container {
+            background: #f1f3f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            position: relative;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .copy-btn:hover { opacity: 1; }
+        .copy-btn svg { width: 1.6rem; height: 1.6rem; }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            padding: 1.8rem;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            top: 0.8rem;
+            right: 1.2rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .close:hover { color: #343a40; }
+        .actions { margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .license { margin-top: 3rem; text-align: center; font-size: 0.9rem; color: #6c757d; }
+        @media (min-width: 768px) {
+            body { padding: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Arcana</h1>
+    <p>Geometric email signatures — hex-encoded, vector-quantization inspired, with a hidden GitHub Easter egg.</p>
+
+    <h2>Create Your Signature</h2>
+    <form id="sigForm">
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Alan T Miller">
+
+        <label for="company">Company (optional)</label>
+        <input type="text" id="company" placeholder="Scatterworks Venture Studio">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="alan@alantmiller.com">
+
+        <label for="website">Website (optional)</label>
+        <input type="url" id="website" placeholder="https://alantmiller.com">
+    </form>
+
+    <div id="output-container">
+        <div id="output">Start typing above…</div>
+        <button class="copy-btn" id="copy-sig-btn" title="Copy to clipboard" aria-label="Copy signature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+        </button>
+        <div class="actions">
+            <button id="email-sig-btn">✉️ Email to myself</button>
+        </div>
+    </div>
+
+    <p style="margin: 2rem 0;">
+        <button id="open-decoder" style="background:#198754">🧩 Open Decoder</button>
+    </p>
+
+    <h2>Simple Vector Quantization Demo</h2>
+    <input type="text" id="vq-text" placeholder="Type here to see quantization…">
+    <div id="vq-output-container">
+        <div id="vq-output"></div>
+        <button class="copy-btn" id="copy-vq-btn" title="Copy VQ result">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Decoder Modal -->
+    <div id="decoder-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <span class="close" aria-label="Close">×</span>
+            <h2>Arcana Decoder</h2>
+            <p>Paste the symbol block to reveal the message:</p>
+            <textarea id="encoded-input" rows="5" placeholder="Paste symbols here…"></textarea>
+            <div style="margin-top:1rem;">
+                <button id="decode-btn">Decode</button>
+            </div>
+            <div id="decode-output-container" style="margin-top:1.5rem;">
+                <div id="decode-output"></div>
+                <button class="copy-btn" id="copy-decode-btn" title="Copy decoded text">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                </button>
+                <div class="actions">
+                    <button id="email-decode-btn">✉️ Email result</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="license">
+        MIT License · <a href="https://github.com/alantmiller/arcana" target="_blank">Source on GitHub</a>
+    </div>
+
+    <script>
+        const symbolMap = {
+            '0':'□','1':'■','2':'◇','3':'◆','4':'○','5':'●','6':'△','7':'▲',
+            '8':'▽','9':'▼','a':'◻','b':'◼','c':'◯','d':'★','e':'☆','f':'◎'
+        };
+
+        const reverseMap = Object.fromEntries(Object.entries(symbolMap).map(([k,v])=>[v,k]));
+
+        const HIDDEN = 'https://github.com/alantmiller/arcana';
+
+        function generateSignature() {
+            const name    = document.getElementById('name').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const email   = document.getElementById('email').value.trim();
+            const website = document.getElementById('website').value.trim();
+
+            const parts = [name];
+            if (company) parts.push(company);
+            if (email)   parts.push(email);
+            if (website) parts.push(website);
+            parts.push(HIDDEN);
+
+            const message = parts.filter(Boolean).join(' | ');
+            if (!message) return 'Start typing above…';
+
+            const bytes = new TextEncoder().encode(message);
+            const hex = [...bytes].map(b => b.toString(16).padStart(2,'0')).join('');
+            const symbols = [...hex].map(c => symbolMap[c] || '').join('');
+
+            const lines = symbols.match(/.{1,60}/g) || [symbols];
+            return message + '\n\n' + lines.join('\n');
+        }
+
+        function updateSignature() {
+            document.getElementById('output').textContent = generateSignature();
+        }
+
+        // Real-time
+        document.querySelectorAll('#sigForm input').forEach(el =>
+            el.addEventListener('input', updateSignature)
+        );
+        updateSignature();
+
+        // Validation
+        const Validation = zod.object({
+            name: zod.string().trim().min(3, 'Name ≥ 3 characters'),
+            email: zod.string().trim().email('Valid email required')
+        });
+
+        function validate() {
+            try {
+                Validation.parse({
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value
+                });
+                return { ok: true };
+            } catch (e) {
+                return { ok: false, error: e.errors?.[0]?.message ?? 'Invalid input' };
+            }
+        }
+
+        // Copy / Email actions
+        document.getElementById('copy-sig-btn').onclick = () => {
+            const v = validate();
+            if (!v.ok) return alert(v.error);
+            navigator.clipboard.writeText(document.getElementById('output').textContent)
+                .then(() => alert('Copied!'));
+        };
+
+        document.getElementById('email-sig-btn').onclick = () => {
+            const v = validate();
+            if (!v.ok) return alert(v.error);
+            const email = document.getElementById('email').value.trim();
+            const body = encodeURIComponent(document.getElementById('output').textContent);
+            location.href = `mailto:${email}?subject=My Arcana Signature&body=${body}`;
+        };
+
+        // Modal
+        const modal = document.getElementById('decoder-modal');
+        document.getElementById('open-decoder').onclick = () => modal.style.display = 'flex';
+        document.querySelector('.close').onclick = () => modal.style.display = 'none';
+        modal.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+        // Decode
+        document.getElementById('decode-btn').onclick = () => {
+            const raw = document.getElementById('encoded-input').value.trim().replace(/\s+/g,'');
+            if (raw.length < 42) {
+                document.getElementById('decode-output').textContent = 'Need ≥ 42 symbols';
+                return;
+            }
+
+            let hex = '';
+            for (const c of raw) {
+                if (reverseMap[c]) hex += reverseMap[c];
+            }
+
+            if (hex.length % 2 !== 0) {
+                document.getElementById('decode-output').textContent = 'Invalid (odd length)';
+                return;
+            }
+
+            try {
+                const bytes = new Uint8Array(hex.match(/.{2}/g).map(x=>parseInt(x,16)));
+                const text = new TextDecoder().decode(bytes);
+                document.getElementById('decode-output').textContent = text;
+            } catch {
+                document.getElementById('decode-output').textContent = 'Decode failed';
+            }
+        };
+
+        document.getElementById('copy-decode-btn').onclick = () => {
+            const t = document.getElementById('decode-output').textContent;
+            if (t.includes('failed') || t.includes('Invalid')) return alert('Nothing valid to copy');
+            navigator.clipboard.writeText(t).then(()=>alert('Decoded text copied'));
+        };
+
+        document.getElementById('email-decode-btn').onclick = () => {
+            const t = document.getElementById('decode-output').textContent;
+            if (t.includes('failed') || t.includes('Invalid')) return alert('Decode first');
+            const email = prompt('Your email address:');
+            if (!email || !zod.string().email().safeParse(email).success) return alert('Valid email please');
+            location.href = `mailto:${email}?subject=Arcana Decoded&body=${encodeURIComponent(t)}`;
+        };
+
+        // VQ demo
+        document.getElementById('vq-text').oninput = e => {
+            const t = e.target.value.trim();
+            if (!t) {
+                document.getElementById('vq-output').textContent = '';
+                return;
+            }
+            const vec = [...t].map(c => c.charCodeAt(0)/255);
+            const q = vec.map(v => Math.min(3, Math.floor(v*4)));
+            const sym = ['≈','∆','≋','∇'];
+            const out = q.map(i=>sym[i]).join('');
+            const lines = out.match(/.{1,60}/g) || [out];
+            document.getElementById('vq-output').textContent =
+                `Input: ${t}\nBins: [${q.join(', ')}]\n\n${lines.join('\n')}`;
+        };
+
+        document.getElementById('copy-vq-btn').onclick = () => {
+            const t = document.getElementById('vq-output').textContent;
+            if (!t) return;
+            navigator.clipboard.writeText(t).then(()=>alert('VQ demo copied'));
+        };
+    </script>
+</body>
+</html>

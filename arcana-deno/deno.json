@@ -1,0 +1,21 @@
+{
+  "tasks": {
+    "dev": "deno run -A --watch npm:vite",
+    "build": "deno run -A npm:vite build",
+    "preview": "deno run -A npm:vite preview"
+  },
+  "imports": {
+    "vite": "npm:vite@^5.4",
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0",
+    "react": "npm:react@^18",
+    "react-dom": "npm:react-dom@^18",
+    "@types/react": "npm:@types/react@^18",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
+  "lint": { "rules": { "tags": ["recommended"] } },
+  "fmt": { "useTabs": false, "lineWidth": 100 }
+}
